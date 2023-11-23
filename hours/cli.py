@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Tuple, List
+from typing import Annotated, List, Tuple
 
 import typer
 import xlsxwriter
@@ -8,14 +8,10 @@ from rich.console import Console
 from rich.table import Table
 from typer import Typer
 
-from date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
+from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
 from hours.db import Database
 
-app = Typer(
-    name="hours",
-    help="A minimalistic hours logger for the command line.",
-    no_args_is_help=True
-)
+app = Typer(name="hours", help="A minimalistic hours logger for the command line.", no_args_is_help=True)
 
 
 def show_table(result: List[Tuple[int, str, float, str, str, str]]):
@@ -27,39 +23,32 @@ def show_table(result: List[Tuple[int, str, float, str, str, str]]):
     table.add_column("Task")
     table.add_column("Description")
     for row in result:
-        table.add_row(
-            str(row[0]),
-            row[1].split(" ")[0],
-            str(row[2]),
-            row[3],
-            row[4],
-            row[5]
-        )
+        table.add_row(str(row[0]), row[1].split(" ")[0], str(row[2]), row[3], row[4], row[5])
     console = Console()
     console.print(table)
 
 
 @app.command(no_args_is_help=True, help="Log worked hours.")
 def log(
-        project: Annotated[
-            str, typer.Option("-p", "--project",
-                              help="Project name, the default is to grab the last one logged.")] = None,
-        task: Annotated[str, typer.Option("-t", "--task",
-                                          help="Task name, the default is to grab the last one logged.")] = None,
-        description: Annotated[str, typer.Option("-s", "--description",
-                                                 help="Task description")] = "",
-        date: Annotated[datetime, typer.Option(
-            "-d", "--date",
-            help="Day (ISO format)",
-            formats=["%Y-%m-%d"])] = datetime.now().date().isoformat(),
-        hours: Annotated[float, typer.Option
-            ("-h", "--hours",
-             help="Task name")] = 8.0,
-        copy: Annotated[bool, typer.Option(
-            "-c", "--copy",
-            help="Copy last entry for today, and overwrite values if specified",
-            flag_value=True)] = False
-
+    project: Annotated[
+        str, typer.Option("-p", "--project", help="Project name, the default is to grab the last one logged.")
+    ] = None,
+    task: Annotated[
+        str, typer.Option("-t", "--task", help="Task name, the default is to grab the last one logged.")
+    ] = None,
+    description: Annotated[str, typer.Option("-s", "--description", help="Task description")] = "",
+    date: Annotated[
+        datetime, typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"])
+    ] = datetime.now()
+    .date()
+    .isoformat(),
+    hours: Annotated[float, typer.Option("-h", "--hours", help="Task name")] = 8.0,
+    copy: Annotated[
+        bool,
+        typer.Option(
+            "-c", "--copy", help="Copy last entry for today, and overwrite values if specified", flag_value=True
+        ),
+    ] = False,
 ):
     with Database(Path("logs.db")) as db:
         _, _, hours_, project_, task_, description_ = db.get_hours()[-1]
@@ -76,37 +65,39 @@ def log(
 
 @app.command(help="List work log entries")
 def list(
-        from_date: Annotated[
-            datetime, typer.Option("-f", "--from",
-                                   help="From day (ISO format), default: first day of the month",
-                                   formats=["%Y-%m-%d"])] = first_day_of_month().isoformat(),
-        to_date: Annotated[datetime, typer.Option("-u", "--until",
-                                                  help="To day (ISO format), default: tomorrow",
-                                                  formats=["%Y-%m-%d"])] = tomorrow().isoformat(),
-        show_all: Annotated[bool, typer.Option("-a", "--all", help="Show all entries")] = False
+    from_date: Annotated[
+        datetime,
+        typer.Option(
+            "-f", "--from", help="From day (ISO format), default: first day of the month", formats=["%Y-%m-%d"]
+        ),
+    ] = first_day_of_month().isoformat(),
+    to_date: Annotated[
+        datetime, typer.Option("-u", "--until", help="To day (ISO format), default: tomorrow", formats=["%Y-%m-%d"])
+    ] = tomorrow().isoformat(),
+    show_all: Annotated[bool, typer.Option("-a", "--all", help="Show all entries")] = False,
 ):
     with Database(Path("logs.db")) as db:
         result: list[tuple[int, str, float, str, str, str]] = db.get_hours(
-            from_date if not show_all else None,
-            to_date if not show_all else None
+            from_date if not show_all else None, to_date if not show_all else None
         )
         show_table(result)
 
 
 @app.command(help="Create an XLS report of the work log entries", no_args_is_help=True)
 def export(
-        hourly_rate: Annotated[float, typer.Option("-r", "--rate", help="Hourly rate")],
-        out_path: Annotated[Path, typer.Option("-o", "--out",
-                                               help="Output path, the default name is the year and the "
-                                                    "month of the given interval")] = None,
-        from_date: Annotated[datetime, typer.Option("-s", "--since",
-                                                    help="Since day (ISO format)",
-                                                    formats=["%Y-%m-%d"])] = \
-                first_day_of_prev_month().isoformat(),
-        to_date: Annotated[datetime, typer.Option("-u", "--until",
-                                                  help="Until day (ISO format)",
-                                                  formats=["%Y-%m-%d"])] = first_day_of_month().isoformat(),
-
+    hourly_rate: Annotated[float, typer.Option("-r", "--rate", help="Hourly rate")],
+    out_path: Annotated[
+        Path,
+        typer.Option(
+            "-o", "--out", help="Output path, the default name is the year and the " "month of the given interval"
+        ),
+    ] = None,
+    from_date: Annotated[
+        datetime, typer.Option("-s", "--since", help="Since day (ISO format)", formats=["%Y-%m-%d"])
+    ] = first_day_of_prev_month().isoformat(),
+    to_date: Annotated[
+        datetime, typer.Option("-u", "--until", help="Until day (ISO format)", formats=["%Y-%m-%d"])
+    ] = first_day_of_month().isoformat(),
 ):
     year_w_mont_name = from_date.strftime("%Y %B")
     out_path = Path(year_w_mont_name + ".xlsx")

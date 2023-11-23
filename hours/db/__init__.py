@@ -36,36 +36,20 @@ class Database:
         cursor = self._conn.cursor()
         cursor.execute(
             "INSERT INTO entry (id, day, hours, project, task, description) VALUES(?, ?, ?, ?, ?, ?)",
-            [
-                None,
-                day,
-                hours,
-                project,
-                task,
-                description
-            ]
+            [None, day, hours, project, task, description],
         )
         self._conn.commit()
 
     def remove_hours(self, ids: List[int]) -> None:
         cursor = self._conn.cursor()
-        cursor.executemany(
-            "DELETE FROM entry WHERE id = ?",
-            [
-                (id,) for id in ids
-            ]
-        )
+        cursor.executemany("DELETE FROM entry WHERE id = ?", [(id,) for id in ids])
         self._conn.commit()
 
-    def get_hours(self, from_date: datetime.datetime | None = None, to_date: datetime.datetime | None = None) -> list[
-        tuple]:
+    def get_hours(
+        self, from_date: datetime.datetime | None = None, to_date: datetime.datetime | None = None
+    ) -> list[tuple]:
         from_date = from_date or 0
         to_date = to_date or datetime.datetime.now()
         cursor = self._conn.cursor()
-        cursor.execute(
-            "SELECT * FROM entry WHERE day >= ? AND day < ? ORDER BY id ASC",
-            [
-                from_date, to_date
-            ]
-        )
+        cursor.execute("SELECT * FROM entry WHERE day >= ? AND day < ? ORDER BY id ASC", [from_date, to_date])
         return cursor.fetchall()
