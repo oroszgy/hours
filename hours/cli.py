@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, List, Tuple
+from typing import Annotated, List
 
 import typer
 import xlsxwriter
@@ -11,6 +11,7 @@ from typer import Typer
 from hours.config import DEFAULT_CONFIG
 from hours.controller import Controller
 from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
+from hours.model import Entry
 
 app = Typer(name="hours", help="A minimalistic hours logger for the command line.", no_args_is_help=True)
 
@@ -19,28 +20,23 @@ def make_controller():
     return Controller(DEFAULT_CONFIG.db_path)
 
 
-def show_table(result: List[Tuple[int, str, float, str, str, str]]):
+def show_table(results: List[Entry]):
     table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("ID", justify="right")
     table.add_column("Day")
     table.add_column("Hours", justify="right")
     table.add_column("Project")
     table.add_column("Task")
     table.add_column("Description")
-    for row in result:
-        table.add_row(str(row[0]), row[1].split(" ")[0], str(row[2]), row[3], row[4], row[5])
+    for entry in results:
+        table.add_row(entry.day.isoformat(), str(entry.hours), entry.project, entry.task)
     console = Console()
     console.print(table)
 
 
 @app.command(no_args_is_help=True, help="Log worked hours.")
 def log(
-    project: Annotated[
-        str, typer.Option("-p", "--project", help="Project name, the default is to grab the last one logged.")
-    ] = None,
-    task: Annotated[
-        str, typer.Option("-t", "--task", help="Task name, the default is to grab the last one logged.")
-    ] = None,
+    project: Annotated[str, typer.Option("-p", "--project", help="Project name")] = None,
+    task: Annotated[str, typer.Option("-t", "--task", help="Task name")] = None,
     date: Annotated[
         datetime, typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"])
     ] = datetime.now()
@@ -55,15 +51,15 @@ def log(
     ] = False,
 ):
     controller = make_controller()
-    _, _, hours_, project_, task_, description_ = controller.get_entries()[-1]
-    project = project or project_
-    task = task or task_
+
     if copy:
-        hours = hours or hours_
+        entries = controller.get_entries()
+        last_entry = entries[-1]
+        project = project or last_entry.project
+        task = task or last_entry.task
+        hours = hours or last_entry.task
 
     controller.log_hours(project, task, date, hours)
-
-    controller.get_entries()
 
 
 @app.command(help="List work log entries", name="list")
@@ -80,8 +76,8 @@ def list_(
     show_all: Annotated[bool, typer.Option("-a", "--all", help="Show all entries")] = False,
 ):
     controller = make_controller()
-    result: list[tuple[int, str, float, str, str, str]] = controller.get_entries(
-        from_date if not show_all else None, to_date if not show_all else None
+    result: list[Entry] = list(
+        controller.get_entries(from_date if not show_all else None, to_date if not show_all else None)
     )
     show_table(result)
 
@@ -105,7 +101,7 @@ def export(
     year_w_mont_name = from_date.strftime("%Y %B")
     out_path = Path(year_w_mont_name + ".xlsx")
     controller = make_controller()
-    result: list[tuple[int, str, float, str, str, str]] = controller.get_entries(from_date, to_date)
+    result: list[Entry] = list(controller.get_entries(from_date, to_date))
     show_table(result)
     with xlsxwriter.Workbook(out_path) as workbook:
         worksheet = workbook.add_worksheet(year_w_mont_name)
@@ -123,29 +119,27 @@ def export(
         worksheet.set_column(1, 1, 20)
         worksheet.write(0, 2, "Task", bold)
         worksheet.set_column(2, 2, 20)
-        worksheet.write(0, 3, "Description", bold)
+        worksheet.write(0, 3, "Duration", bold)
         worksheet.set_column(3, 3, 20)
-        worksheet.write(0, 4, "Duration", bold)
-        worksheet.write(0, 5, "Amount", bold)
-        worksheet.set_column(5, 5, 15)
+        worksheet.write(0, 4, "Amount", bold)
+        worksheet.set_column(4, 4, 15)
 
         # worksheet.autofit()
 
         total_hours: float = 0.0
         total_amount: float = 0.0
-        for i, (_, date, hours, project, task, description) in enumerate(result):
-            worksheet.write(i + 1, 0, date.split()[0])
-            worksheet.write(i + 1, 1, project)
-            worksheet.write(i + 1, 2, task)
-            worksheet.write(i + 1, 3, description, wrapped)
-            worksheet.write(i + 1, 4, hours, hours_format)
-            total_hours += hours
-            worksheet.write(i + 1, 5, hours * hourly_rate, euro_format)
-            total_amount += hours * hourly_rate
+        for i, entry in enumerate(result):
+            worksheet.write(i + 1, 0, entry.day.isoformat())
+            worksheet.write(i + 1, 1, entry.project)
+            worksheet.write(i + 1, 2, entry.task)
+            worksheet.write(i + 1, 3, entry.hours, hours_format)
+            total_hours += entry.hours
+            worksheet.write(i + 1, 4, entry.hours * hourly_rate, euro_format)
+            total_amount += entry.hours * hourly_rate
 
         worksheet.write(i + 3, 3, "Total", bold)
-        worksheet.write_formula(i + 3, 4, f"=SUM(E2:E{i + 2})", bold_hours_format, total_hours)
-        worksheet.write_formula(i + 3, 5, f"=SUM(F2:F{i + 2})", bold_euro_format, total_amount)
+        worksheet.write_formula(i + 3, 3, f"=SUM(D2:D{i + 2})", bold_hours_format, total_hours)
+        worksheet.write_formula(i + 3, 4, f"=SUM(E2:E{i + 2})", bold_euro_format, total_amount)
 
 
 @app.command(help="Remove a work log entries", no_args_is_help=True)

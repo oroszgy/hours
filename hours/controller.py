@@ -8,9 +8,11 @@ from hours.model import Entry
 
 
 class Controller:
-    def __init__(self, db_path: Optional[Path]):
+    def __init__(self, db_path: Optional[Path], debug=False):
         self._db_path: Path | None = db_path
-        self._engine = create_engine(f"sqlite://{self._db_path.resolve() if self._db_path else ''}", echo=True)
+        self._engine = create_engine(
+            f"sqlite:///{self._db_path.resolve() if self._db_path else ':memory:'}", echo=debug
+        )
         self._create_model_if_not_exists()
 
     def _create_model_if_not_exists(self):
