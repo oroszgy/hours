@@ -14,6 +14,7 @@ python = "^3.11"
 rich = "^13.7.0"
 typer = "^0.9.0"
 xlsxwriter = "^3.1.9"
+sqlmodel = "^0.0.12"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"
@@ -43,6 +44,7 @@ select = [
 ignore = [
     "E501",  # line too long, handled by black
     "C901",  # too complex
+    "B008",  # too complex
 ]
 
 [tool.ruff.isort]
