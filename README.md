@@ -49,7 +49,7 @@ hours --help
 
 # Roadmap
 
-- [ ] Error handling, copy
-- [ ] CI/CD: GitHub Actions
-- [ ] Documentation: mkdocs
+- [ ] Thorough tests
+- [ ] Configration system
+- [ ] Documentation
 
