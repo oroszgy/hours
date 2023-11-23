@@ -29,7 +29,7 @@ def log(
     duplicate: Annotated[
         bool,
         typer.Option(
-            "-d",
+            "-l",
             "--duplicate-last",
             help="Duplicate last entry for today, and overwrite values if specified",
             flag_value=True,
@@ -57,8 +57,8 @@ def update(
     controller.update_entry(entry_id, project, task, date, hours)
 
 
-@app.command(help="List work log entries", name="list")
-def list_(
+@app.command(help="List work log entries")
+def report(
     client: Annotated[str, typer.Option("-c", "--client", help="Client name")] = None,
     from_date: Annotated[
         datetime,
@@ -111,7 +111,7 @@ def add_client(
     controller.add_client(name, rate, currency)
 
 
-@clients_app.command(help="Update a client", no_args_is_help=True, name="add")
+@clients_app.command(help="Update a client", no_args_is_help=True, name="update")
 def update_client(
     name: Annotated[str, typer.Option("-n", "--name", help="Client name")] = None,
     rate: Annotated[float, typer.Option("-r", "--rate", help="Hourly rate")] = None,

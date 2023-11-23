@@ -28,18 +28,19 @@ class EntryController:
 
     def _get_entries(
         self,
-        client: str | None = None,
+        client_name: str | None = None,
         from_date: date | None = None,
         to_date: date | None = None,
     ) -> Sequence[Entry]:
+        client: Client = self.get_client_by_name(client_name)
         with Session(self._engine) as session:
             statement = select(Entry)
             if from_date is not None:
                 statement = statement.where(Entry.day >= from_date)
             if to_date is not None:
                 statement = statement.where(Entry.day < to_date)
-            if client is not None:
-                statement = statement.where(Entry.client.has(Client.name == client))
+            if client_name is not None:
+                statement = statement.where(Entry.client_id == client.id)
 
             statement = statement.order_by(Entry.day).order_by(Entry.id)
 
@@ -118,7 +119,7 @@ class EntryController:
             project = project or last_entry.project
             task = task or last_entry.task
             hours = hours or last_entry.task
-            client = client or last_entry.client.name
+            client = client or self.get_client_by_id(last_entry.client_id).name
 
         self._add_entry(client, project, task, day, hours)
 
