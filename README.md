@@ -6,31 +6,31 @@ A minimalistic work time logger for the command line.
 
 First add a client:
 ```bash
-$ hours clients add -c BigCorporate --rate 100 --currency €
-$ hours clients list
+hours clients add -c BigCorporate --rate 100 --currency €
+hours clients list
 ```
 Then log your work for today:
 ```bash
-$ hours log -c BigCorporate -h 8.0 -p "ML pipeline" -t "fixing bugs"
+hours log -c BigCorporate -h 8.0 -p "ML pipeline" -t "fixing bugs"
 ```
 
 Get a report for the current month:
 ```bash
-$ hours report 
+hours report 
 ```
 
 Create a timesheet to Excel file:
 ```bash
-$ hours export
+hours export
 ```
 
 For more information, see the help:
 ```bash
-❯ hours --help
+hours --help
                                                                                                                                                                                                                                             
  Usage: hours [OPTIONS] COMMAND [ARGS]...                                                                                                                                                                                                   
                                                                                                                                                                                                                                             
- A minimalistic hours logger for the command line.                                                                                                                                                                                          
+ A minimalistic work time logger for the command line.                                                                                                                                                                                  
                                                                                                                                                                                                                                             
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell. [default: None]                                                                                                                 │

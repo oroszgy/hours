@@ -9,7 +9,7 @@ from hours.config import DEFAULT_CONFIG
 from hours.controller import EntryController
 from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
 
-app = Typer(name="hours", help="A minimalistic hours logger for the command line.", no_args_is_help=True)
+app = Typer(name="hours", help="A minimalistic work time logger for the command line.", no_args_is_help=True)
 
 
 controller = EntryController(DEFAULT_CONFIG.db_path)
