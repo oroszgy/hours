@@ -4,9 +4,7 @@ A minimalistic work time logger for the command line.
 
 # Roadmap
 
-- [ ] Pypoetry setup: ruff, black, pytest, pre-commit
+- [ ] Error handling, copy
 - [ ] CI/CD: GitHub Actions
 - [ ] Documentation: mkdocs
-- [ ] MVC
-- [ ] Tests
-- [ ] SQLModel
+
