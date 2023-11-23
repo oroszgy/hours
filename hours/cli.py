@@ -9,7 +9,7 @@ from rich.table import Table
 from typer import Typer
 
 from hours.config import DEFAULT_CONFIG
-from hours.controller import Controller
+from hours.controller import EntryController
 from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
 from hours.model import Entry
 
@@ -17,7 +17,7 @@ app = Typer(name="hours", help="A minimalistic hours logger for the command line
 
 
 def make_controller():
-    return Controller(DEFAULT_CONFIG.db_path)
+    return EntryController(DEFAULT_CONFIG.db_path)
 
 
 def show_table(results: List[Entry]):

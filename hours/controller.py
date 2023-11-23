@@ -7,7 +7,7 @@ from sqlmodel import Session, SQLModel, create_engine, select
 from hours.model import Entry
 
 
-class Controller:
+class EntryController:
     def __init__(self, db_path: Optional[Path], debug=False):
         self._db_path: Path | None = db_path
         self._engine = create_engine(

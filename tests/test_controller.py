@@ -3,16 +3,16 @@ from typing import List
 
 import pytest
 
-from hours.controller import Controller
+from hours.controller import EntryController
 from hours.model import Entry
 
 
 @pytest.fixture()
-def controller() -> Controller:
-    return Controller(None)
+def controller() -> EntryController:
+    return EntryController(None)
 
 
-def test_if_log_hours_stored_data(controller: Controller):
+def test_if_log_hours_stored_data(controller: EntryController):
     controller.log_hours("project", "task1", date.fromisoformat("2021-01-01"), 8.0)
     controller.log_hours("project", "task2", date.fromisoformat("2021-01-02"), 8.0)
     controller.log_hours("project2", "task3", date.fromisoformat("2021-01-03"), 8.0)
@@ -22,7 +22,7 @@ def test_if_log_hours_stored_data(controller: Controller):
     assert len(entries) == 3
 
 
-def test_if_remove_entries_deletes_multiple_data(controller: Controller):
+def test_if_remove_entries_deletes_multiple_data(controller: EntryController):
     controller.log_hours("project", "task1", date.fromisoformat("2021-01-01"), 8.0)
     controller.log_hours("project", "task2", date.fromisoformat("2021-01-02"), 8.0)
     controller.log_hours("project2", "task3", date.fromisoformat("2021-01-03"), 8.0)
@@ -34,7 +34,7 @@ def test_if_remove_entries_deletes_multiple_data(controller: Controller):
     assert entries[0].id == 3
 
 
-def test_if_remove_entries_deletes_data(controller: Controller):
+def test_if_remove_entries_deletes_data(controller: EntryController):
     controller.log_hours("project", "task1", date.fromisoformat("2021-01-01"), 8.0)
     controller.log_hours("project", "task2", date.fromisoformat("2021-01-02"), 8.0)
     controller.log_hours("project2", "task3", date.fromisoformat("2021-01-03"), 8.0)
@@ -45,7 +45,7 @@ def test_if_remove_entries_deletes_data(controller: Controller):
     assert len(entries) == 2
 
 
-def test_if_get_entries_returns_ordered_data(controller: Controller):
+def test_if_get_entries_returns_ordered_data(controller: EntryController):
     controller.log_hours("project", "task1", date.fromisoformat("2021-01-01"), 8.0)
     controller.log_hours("project2", "task3", date.fromisoformat("2021-01-03"), 8.0)
     controller.log_hours("project", "task2", date.fromisoformat("2021-01-02"), 8.0)
