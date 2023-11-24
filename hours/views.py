@@ -25,7 +25,7 @@ class ConsoleDisplay:
             table.add_column(header, justify=justify_column)
         return table
 
-    def show_entries(self, entries: List[Entry], clients: List[Client]) -> None:
+    def show_entries(self, entries: List[Entry]) -> None:
         table = self._create_table(
             ["Id", "Client", "Day", "Project", "Task", "Hours", "Amount"],
             bold=True,
@@ -34,27 +34,36 @@ class ConsoleDisplay:
 
         total_hours: float = 0.0
         total_amount: float = 0.0
-        for entry, client in zip(entries, clients):
-            amount: float = client.rate * entry.hours
+        for entry in entries:
+            amount: float = entry.client.rate * entry.hours
             table.add_row(
                 str(entry.id),
-                client.name,
+                entry.client.name,
                 entry.day.isoformat(),
                 entry.project,
                 entry.task,
                 str(entry.hours),
-                f"{client.currency}{amount :.2f}",
+                f"{entry.client.currency}{amount :.2f}",
             )
             total_hours += entry.hours
             total_amount += amount
 
-        if len(set(client.currency for client in clients)) > 1:
+        if len({e.client.currency for e in entries}) > 1 or len(entries) == 0:
             total_amount_str = "?"
         else:
-            total_amount_str = f"{clients[0].currency}{total_amount :,.2f}"
+            total_amount_str = f"{entries[0].client.currency}{total_amount :,.2f}"
 
         table.add_section()
-        table.add_row("", "", "", "", "Total", str(total_hours), total_amount_str, style="bold green")
+        table.add_row(
+            "",
+            "",
+            "",
+            "",
+            "Total",
+            str(total_hours),
+            total_amount_str,
+            style="bold green",
+        )
 
         self._console.print(table)
 
@@ -70,11 +79,16 @@ class FileDisplay:
     def save_to_excel(
         self,
         entries: list[Entry],
-        hourly_rate: float,
-        currency: str,
         out_path: Path,
         sheet_name: str,
     ) -> None:
+        if len(entries) > 0:
+            currency = entries[0].client.currency
+            hourly_rate = entries[0].client.rate
+        else:
+            currency = ""
+            hourly_rate = 0
+
         with xlsxwriter.Workbook(out_path) as workbook:
             worksheet = workbook.add_worksheet(sheet_name)
             bold = workbook.add_format({"bold": True})
@@ -109,6 +123,7 @@ class FileDisplay:
                 worksheet.write(i + 1, 4, entry.hours * hourly_rate, euro_format)
                 total_amount += entry.hours * hourly_rate
 
-            worksheet.write(i + 3, 3, "Total", bold)
-            worksheet.write_formula(i + 3, 3, f"=SUM(D2:D{i + 2})", bold_hours_format, total_hours)
-            worksheet.write_formula(i + 3, 4, f"=SUM(E2:E{i + 2})", bold_euro_format, total_amount)
+            last_row = len(entries) + 2
+            worksheet.write(last_row, 3, "Total", bold)
+            worksheet.write_formula(last_row, 3, f"=SUM(D2:D{last_row -1 })", bold_hours_format, total_hours)
+            worksheet.write_formula(last_row, 4, f"=SUM(E2:E{last_row - 1})", bold_euro_format, total_amount)

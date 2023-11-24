@@ -33,6 +33,7 @@ sqlmodel = "^0.0.12"
 black = "^23.11.0"
 ruff = "^0.1.6"
 pytest = "^7.4.3"
+coverage = "^7.3.2"
 
 [tool.poetry.scripts]
 hours = "hours.cli:app"
@@ -44,6 +45,7 @@ line-length = 120
 [tool.ruff]
 # Same as Black.
 line-length = 120
+cache-dir = ".cache/ruff"
 
 select = [
     "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
@@ -65,6 +67,11 @@ relative-imports-order = "closest-to-furthest"
 extra-standard-library = ["typing"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 known-first-party = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-s -v --durations=0 -m 'not slow'"
+cache_dir = ".cache/pytest"
 
 [build-system]
 requires = ["poetry-core"]

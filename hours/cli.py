@@ -36,10 +36,14 @@ def log(
         ),
     ] = False,
 ):
-    if duplicate is False and (client is None or project is None or task is None):
-        typer.echo("You need to specify all the arguments if you are not duplicating the last entry.")
-        raise typer.Exit(1)
-    controller.add_entry(client, project, task, date, hours, duplicate)
+    if duplicate:
+        controller.duplicate_last_entry(client, project, task, date, hours)
+    else:
+        if client is None or project is None or task is None or hours is None:
+            typer.echo("You need to specify all the arguments if you are not duplicating the last entry.")
+            raise typer.Exit(1)
+        else:
+            controller.add_entry(client, project, task, date, hours)
 
 
 @app.command(no_args_is_help=True, help="Log worked hours.")
@@ -113,11 +117,11 @@ def add_client(
 
 @clients_app.command(help="Update a client", no_args_is_help=True, name="update")
 def update_client(
-    name: Annotated[str, typer.Option("-n", "--name", help="Client name")] = None,
+    name: Annotated[str, typer.Option("-n", "--name", help="Client name")],
     rate: Annotated[float, typer.Option("-r", "--rate", help="Hourly rate")] = None,
     currency: Annotated[str, typer.Option("-c", "--currency", help="Currency")] = None,
 ):
-    if name is None and rate is None and currency is None:
+    if rate is None and currency is None:
         typer.echo("You need to specify at least one argument to update.")
         raise typer.Exit(1)
     controller.update_client(name, rate, currency)
