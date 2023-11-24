@@ -11,6 +11,8 @@ from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorr
 
 app = Typer(name="hours", help="A minimalistic work time logger for the command line.", no_args_is_help=True)
 
+if not DEFAULT_CONFIG.APP_DIR.exists():
+    DEFAULT_CONFIG.APP_DIR.mkdir(parents=True, exist_ok=True)
 
 controller = EntryController(DEFAULT_CONFIG.db_path)
 
