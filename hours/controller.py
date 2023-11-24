@@ -10,7 +10,7 @@ from hours.views import ConsoleDisplay, FileDisplay
 
 class EntryController:
     def __init__(self, db_path: Optional[Path], debug=False):
-        self._db_path: Path | None = db_path
+        self._db_path: Optional[Path] = db_path
         self._engine = create_engine(
             f"sqlite:///{self._db_path.resolve() if self._db_path else ':memory:'}",
             echo=debug,
@@ -28,9 +28,9 @@ class EntryController:
 
     def get_entries(
         self,
-        client_name: str | None = None,
-        from_date: date | None = None,
-        to_date: date | None = None,
+        client_name: Optional[str] = None,
+        from_date: Optional[date] = None,
+        to_date: Optional[date] = None,
     ) -> Sequence[Entry]:
         with Session(self._engine) as session:
             statement = select(Entry)
@@ -47,11 +47,11 @@ class EntryController:
             results = session.exec(statement)
             return results.all()
 
-    def add_entry(self, client: str, project: str, task: str | None, day: date, hours: float) -> Entry:
+    def add_entry(self, client: str, project: str, task: Optional[str], day: date, hours: float) -> Entry:
         client = self.get_client_by_name(client)
         return self._add_entry(client, project, task, day, hours)
 
-    def _add_entry(self, client: Client, project: str, task: str | None, day: date, hours: float) -> Entry:
+    def _add_entry(self, client: Client, project: str, task: Optional[str], day: date, hours: float) -> Entry:
         with Session(self._engine) as session:
             entry = Entry(day=day, hours=hours, project=project, task=task, client=client)
             session.add(entry)
@@ -91,13 +91,13 @@ class EntryController:
 
             session.commit()
 
-    def update_client(self, name: str, rate: float | None, currenct: str | None) -> Client:
+    def update_client(self, name: str, rate: Optional[float], currency: Optional[str]) -> Client:
         with Session(self._engine) as session:
             client = self.get_client_by_name(name)
             if rate:
                 client.rate = rate
-            if currenct:
-                client.currency = currenct
+            if currency:
+                client.currency = currency
 
             session.commit()
 
@@ -105,11 +105,11 @@ class EntryController:
 
     def duplicate_last_entry(
         self,
-        client_override: str | None = None,
-        project_override: str | None = None,
-        task_override: str | None = None,
-        day_override: date | None = None,
-        hours_override: float | None = None,
+        client_override: Optional[str] = None,
+        project_override: Optional[str] = None,
+        task_override: Optional[str] = None,
+        day_override: Optional[date] = None,
+        hours_override: Optional[float] = None,
     ) -> Entry:
         entries = self.get_entries()
         last_entry: Entry = entries[-1]
@@ -125,8 +125,8 @@ class EntryController:
 
         return self._add_entry(client, project_override, task_override, day_override, hours)
 
-    def display_entries(self, client: str | None, from_date: date, to_date: date, show_all: bool):
-        entries: list[Entry] = list(
+    def display_entries(self, client: Optional[str], from_date: date, to_date: date, show_all: bool):
+        entries: List[Entry] = list(
             self.get_entries(
                 client,
                 from_date if not show_all else None,
@@ -145,7 +145,7 @@ class EntryController:
     ):
         year_w_month_name = from_date.strftime("%Y %B")
         out_path = out_path or Path(f"{client} - {year_w_month_name}.xlsx")
-        result: list[Entry] = list(self.get_entries(client, from_date, to_date))
+        result: List[Entry] = list(self.get_entries(client, from_date, to_date))
 
         self._console_display.show_entries(result)
         self._file_display.save_to_excel(result, out_path, year_w_month_name)
@@ -164,10 +164,10 @@ class EntryController:
     def update_entry(
         self,
         entry_id: int,
-        project: str | None = None,
-        task: str | None = None,
-        day: date | None = None,
-        hours: float | None = None,
+        project: Optional[str] = None,
+        task: Optional[str] = None,
+        day: Optional[date] = None,
+        hours: Optional[float] = None,
     ):
         with Session(self._engine) as session:
             statement = select(Entry).where(Entry.id == entry_id)
@@ -185,5 +185,5 @@ class EntryController:
             session.commit()
 
     def display_clients(self):
-        clients: list[Client] = list(self.get_clients())
+        clients: List[Client] = list(self.get_clients())
         self._console_display.show_clients(clients)
