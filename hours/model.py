@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional
+from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -19,4 +19,4 @@ class Client(SQLModel, table=True):
     name: str = Field(index=True, nullable=False, unique=True)
     rate: float = Field(nullable=False)
     currency: str = Field(nullable=False)
-    entries: list[Entry] = Relationship(back_populates="client")
+    entries: List[Entry] = Relationship(back_populates="client")

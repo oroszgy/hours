@@ -14,7 +14,7 @@ class ConsoleDisplay:
 
     def _create_table(
         self,
-        headers: list[str],
+        headers: List[str],
         justify=None,
         bold: bool = False,
         color: str = "magenta",
@@ -78,7 +78,7 @@ class ConsoleDisplay:
 class FileDisplay:
     def save_to_excel(
         self,
-        entries: list[Entry],
+        entries: List[Entry],
         out_path: Path,
         sheet_name: str,
     ) -> None:
