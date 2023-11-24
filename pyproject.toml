@@ -12,18 +12,18 @@ classifiers = [
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: Apache Software License',
     'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
 ]
 packages = [
     { include = "hours"},
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.8,<3.13"
 rich = "^13.7.0"
 typer = "^0.9.0"
 xlsxwriter = "^3.1.9"
@@ -45,7 +45,6 @@ line-length = 120
 # Same as Black.
 line-length = 120
 
-exclude = ["jupyter_notebook_config.py"]
 select = [
     "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
     "W",  # pycodestyle warnings
