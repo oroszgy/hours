@@ -1,4 +1,4 @@
-# Hours
+# ⏳ Hours
 
 [![Build](https://github.com/oroszgy/hours/actions/workflows/build.yml/badge.svg)](https://github.com/oroszgy/hours/actions/workflows/build.yml)
 
