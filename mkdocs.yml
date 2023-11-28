@@ -1,0 +1,33 @@
+site_name: Hours
+site_description: A minimalistic work time logger for the command line
+site_author: György Orosz
+site_url: https://oroszgy.github.io/hours/
+repo_url: https://github.com/oroszgy/hours
+repo_name: oroszgy/hours
+
+markdown_extensions:
+  - mkdocs-typer
+
+nav:
+  - Quickstart: index.md
+  - Reference: reference.md
+
+
+theme:
+  name: material
+  icon:
+    logo: material/timer-sand-complete
+
+
+
+plugins:
+  - search
+
+#markdown_extensions:
+#  - pymdownx.highlight:
+#      anchor_linenums: true
+#      line_spans: __span
+#      pygments_lang_class: true
+#  - pymdownx.inlinehilite
+#  - pymdownx.snippets
+#  - pymdownx.superfences

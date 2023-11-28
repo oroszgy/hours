@@ -5,14 +5,14 @@ from typing import Annotated, List
 import typer
 from typer import Typer
 
-from hours.config import DEFAULT_CONFIG
+from hours.config import APP_DIR, DEFAULT_CONFIG
 from hours.controller import EntryController
 from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
 
 app = Typer(name="hours", help="A minimalistic work time logger for the command line.", no_args_is_help=True)
 
-if not DEFAULT_CONFIG.APP_DIR.exists():
-    DEFAULT_CONFIG.APP_DIR.mkdir(parents=True, exist_ok=True)
+if not APP_DIR.exists():
+    APP_DIR.mkdir(parents=True, exist_ok=True)
 
 controller = EntryController(DEFAULT_CONFIG.db_path)
 
