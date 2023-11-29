@@ -9,7 +9,11 @@ from hours.config import APP_DIR, DEFAULT_CONFIG
 from hours.controller import EntryController
 from hours.date_utils import first_day_of_month, first_day_of_prev_month, tomorrow
 
-app = Typer(name="hours", help="A minimalistic work time logger for the command line.", no_args_is_help=True)
+app = Typer(
+    name="hours",
+    help="A minimalistic work time logger for the command line.",
+    no_args_is_help=True,
+)
 
 if not APP_DIR.exists():
     APP_DIR.mkdir(parents=True, exist_ok=True)
@@ -23,7 +27,8 @@ def log(
     project: Annotated[str, typer.Option("-p", "--project", help="Project name")] = None,
     task: Annotated[str, typer.Option("-t", "--task", help="Task name")] = None,
     date: Annotated[
-        datetime, typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"])
+        datetime,
+        typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"]),
     ] = datetime.now()
     .date()
     .isoformat(),
@@ -53,7 +58,10 @@ def update(
     entry_id: Annotated[int, typer.Option("-i", "--id", help="Entry id")],
     project: Annotated[str, typer.Option("-p", "--project", help="Project name")] = None,
     task: Annotated[str, typer.Option("-t", "--task", help="Task name")] = None,
-    date: Annotated[datetime, typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"])] = None,
+    date: Annotated[
+        datetime,
+        typer.Option("-d", "--date", help="Day (ISO format)", formats=["%Y-%m-%d"]),
+    ] = None,
     hours: Annotated[float, typer.Option("-h", "--hours", help="Task name")] = None,
 ):
     if project is None and task is None and date is None and hours is None:
@@ -69,11 +77,20 @@ def report(
     from_date: Annotated[
         datetime,
         typer.Option(
-            "-f", "--from", help="From day (ISO format), default: first day of the month", formats=["%Y-%m-%d"]
+            "-f",
+            "--from",
+            help="From day (ISO format), default: first day of the month",
+            formats=["%Y-%m-%d"],
         ),
     ] = first_day_of_month().isoformat(),
     to_date: Annotated[
-        datetime, typer.Option("-u", "--until", help="To day (ISO format), default: tomorrow", formats=["%Y-%m-%d"])
+        datetime,
+        typer.Option(
+            "-t",
+            "--to",
+            help="To day (ISO format), default: tomorrow",
+            formats=["%Y-%m-%d"],
+        ),
     ] = tomorrow().isoformat(),
     show_all: Annotated[bool, typer.Option("-a", "--all", help="Show all entries")] = False,
 ):
@@ -86,14 +103,28 @@ def export(
     out_path: Annotated[
         Path,
         typer.Option(
-            "-o", "--out", help="Output path, the default name is the year and the " "month of the given interval"
+            "-o",
+            "--out",
+            help="Output path, the default name is the year and the " "month of the given interval",
         ),
     ] = None,
     from_date: Annotated[
-        datetime, typer.Option("-s", "--since", help="Since day (ISO format)", formats=["%Y-%m-%d"])
+        datetime,
+        typer.Option(
+            "-f",
+            "--from",
+            help="From day (ISO format), default: first day of the previous month",
+            formats=["%Y-%m-%d"],
+        ),
     ] = first_day_of_prev_month().isoformat(),
     to_date: Annotated[
-        datetime, typer.Option("-u", "--until", help="Until day (ISO format)", formats=["%Y-%m-%d"])
+        datetime,
+        typer.Option(
+            "-t",
+            "--to",
+            help="To day (ISO format), default: first day of the actual month",
+            formats=["%Y-%m-%d"],
+        ),
     ] = first_day_of_month().isoformat(),
 ):
     controller.export_entries(client, from_date, to_date, out_path)
@@ -141,5 +172,5 @@ def list_clients():
     controller.display_clients()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app()
