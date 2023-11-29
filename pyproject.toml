@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hours"
-version = "0.0.0"
+version = "0.1.0"
 description = "Log working hours"
 authors = ["Gyorgy Orosz <gyorgy@orosz.link>"]
 maintainers = ["György Orosz <gyorgy@orosz.link>"]
