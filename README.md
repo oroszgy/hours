@@ -33,8 +33,3 @@ hours export
 
 For more information, see the [documentation](https://oroszgy.github.io/hours).
 
-# Roadmap
-
-- [ ] Thorough tests
-- [ ] Documentation
-
