@@ -15,7 +15,7 @@ pip install hours
 Let's add a client first and set the hourly rate:
 
 ```bash
-hours clients add -c BigCorporate --rate 100 --currency €
+hours clients add -n BigCorporate --rate 100 --currency €
 hours clients list
 ```
 
