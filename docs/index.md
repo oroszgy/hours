@@ -3,7 +3,7 @@
 First, let's add a client and set the hourly rate:
 
 ```bash
-$ hours clients add -c BigCorporate --rate 100 --currency €
+$ hours clients add -n BigCorporate --rate 100 --currency €
 $ hours clients list
 ```
 
