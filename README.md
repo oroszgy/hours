@@ -6,7 +6,13 @@ A minimalistic work time logger for the command line.
 
 ## Usage
 
-First add a client:
+Install the package:
+
+```bash
+pip install hours
+```
+
+Let's add a client first and set the hourly rate:
 
 ```bash
 hours clients add -c BigCorporate --rate 100 --currency €
@@ -19,7 +25,7 @@ Then log your work for today:
 hours log -c BigCorporate -h 8.0 -p "ML pipeline" -t "fixing bugs"
 ```
 
-Get a report for the current month:
+Get a report for the current month (or any other period):
 
 ```bash
 hours report 
