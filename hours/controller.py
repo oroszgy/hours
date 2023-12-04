@@ -32,11 +32,11 @@ class EntryController:
         from_date: Optional[date] = None,
         to_date: Optional[date] = None,
     ) -> Sequence[Entry]:
-        # Workaround for SqlModel bug: it generates a wrong SQL query
-        from_date = from_date - timedelta(microseconds=1)
         with Session(self._engine) as session:
             statement = select(Entry)
             if from_date is not None:
+                # Workaround for SqlModel bug: it generates a wrong SQL query
+                from_date = from_date - timedelta(microseconds=1)
                 statement = statement.where(Entry.day >= from_date)
             if to_date is not None:
                 statement = statement.where(Entry.day < to_date)
