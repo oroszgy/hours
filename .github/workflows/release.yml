@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  build-n-publish:
+  PyPi:
     name: Build and publish wheels to PyPI
     runs-on: ubuntu-latest
     environment:
@@ -42,9 +42,30 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
           packages-dir: dist
 
+  Github:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - uses: Gr1N/setup-poetry@v8
+        with:
+          poetry-version: 1.5.1
+
+      - name: Install Python dependencies
+        run: poetry install --with dev
+
+      - name: Build package
+        run: poetry build -f wheel
       - name: Github release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*.whl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.whl
