@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2023-12-04
+## [0.3.1] - 2024-01-03
+
+### Fixed
+- Fixed date handling bug in the `export` / `report` command
+
+## [0.3.0] - 2024-01-03
 
 ### Fixed
 - Fixed date handling bug in the `export` / `report` command
